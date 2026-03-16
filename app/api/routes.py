@@ -7,7 +7,8 @@ from app.mcp.tools import (
     detect_large_expenses,
     find_duplicate_payments
 )
-from app.services.report_services import generate_anomaly_report
+from app.services.report_services import generate_anomaly_report, generate_explained_report
+
 
 router = APIRouter()
 
@@ -64,3 +65,10 @@ def upload_transactions(file: UploadFile = File(...)):
 def anomaly_report():
 
     return generate_anomaly_report()
+
+
+
+@router.post("/report/anomalies/explain")
+def anomaly_report_with_explanations():
+
+    return generate_explained_report()

@@ -1,7 +1,7 @@
 from openai import OpenAI
-import os
+from app.core.config import OPENAI_API_KEY
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = OpenAI(api_key=OPENAI_API_KEY)
 
 
 def explain_anomaly(anomaly: dict):
@@ -9,15 +9,13 @@ def explain_anomaly(anomaly: dict):
     prompt = f"""
 You are an accounting auditor.
 
-Explain why the following transaction may be suspicious.
+Explain briefly (1–2 sentences) why this transaction might be suspicious.
 
 Transaction:
 Vendor: {anomaly.get("vendor")}
 Amount: {anomaly.get("amount")}
 Description: {anomaly.get("description")}
 Reason flagged: {anomaly.get("reason")}
-
-Provide a short explanation understandable by an accountant.
 """
 
     response = client.chat.completions.create(
@@ -29,3 +27,18 @@ Provide a short explanation understandable by an accountant.
     )
 
     return response.choices[0].message.content
+
+
+def explain_anomalies(anomalies):
+
+    results = []
+
+    for anomaly in anomalies:
+
+        explanation = explain_anomaly(anomaly)
+
+        anomaly["ai_explanation"] = explanation
+
+        results.append(anomaly)
+
+    return results

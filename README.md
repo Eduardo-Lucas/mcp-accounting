@@ -1,41 +1,55 @@
 # MCP Accounting
 
-A minimal **Model Context Protocol (MCP)-style accounting analysis API** built with **Python and FastAPI**.
-This project demonstrates how an AI agent or external service can interact with accounting data through structured API tools to detect financial anomalies.
+An **AI-ready accounting anomaly detection API** built with **Python and FastAPI**.
+This project demonstrates how financial analysis capabilities can be exposed as **callable tools**, making them usable by automation systems or AI agents.
 
-The current MVP focuses on **detecting unusually large transactions** from accounting datasets.
-
----
-
-## Overview
-
-This project provides a lightweight backend service that:
-
-* Loads accounting transactions from a CSV file
-* Detects unusually large transactions
-* Detects potential duplicate payments
-* Exposes the analysis through REST endpoints that can be used by:
-
-  * AI agents
-  * automation workflows
-  * external applications
-
-The API is designed to resemble **MCP-style tool endpoints**, which makes it suitable for integration with LLM-based agents.
+The system analyzes accounting transactions, detects suspicious patterns, and generates **AI explanations for flagged anomalies**.
 
 ---
 
-## Current Features
+# Overview
 
-* Transaction ingestion from CSV
-* Anomaly detection based on statistical thresholds
-* Duplicate payment detection
-* REST API with FastAPI
-* Interactive API documentation via Swagger
-* Command-line testing using `curl` and `jq`
+Traditional accounting analysis is often manual and time-consuming.
+This project explores a different architecture:
+
+**Expose accounting analytics as API tools that can be called by software or AI agents.**
+
+The service:
+
+1. Accepts accounting datasets (CSV)
+2. Detects potential anomalies
+3. Generates a structured report
+4. Uses AI to explain suspicious transactions
 
 ---
 
-## Project Structure
+# Current Features
+
+✔ Upload accounting datasets via API
+✔ Detect unusually large transactions
+✔ Detect duplicate vendor payments
+✔ Generate anomaly reports
+✔ AI-generated explanations for suspicious transactions
+✔ Clean modular FastAPI architecture
+✔ CLI testing with `curl` and `jq`
+
+---
+
+# Architecture
+
+The backend follows a **layered architecture**:
+
+```
+HTTP API
+   ↓
+API Routes
+   ↓
+Service Layer
+   ↓
+Data Layer
+```
+
+Project structure:
 
 ```
 mcp-accounting
@@ -57,7 +71,9 @@ mcp-accounting
 │   │   └── schemas.py
 │   │
 │   ├── services
-│   │   └── anomaly_detection.py
+│   │   ├── anomaly_detection.py
+│   │   ├── report_service.py
+│   │   └── explanation_service.py
 │   │
 │   └── main.py
 │
@@ -70,7 +86,7 @@ mcp-accounting
 
 ---
 
-## Installation
+# Installation
 
 Clone the repository:
 
@@ -94,7 +110,19 @@ pip install -r requirements.txt
 
 ---
 
-## Running the Server
+# Environment Variables
+
+Create a `.env` file in the project root:
+
+```
+OPENAI_API_KEY=your_api_key_here
+```
+
+The application loads this automatically using `python-dotenv`.
+
+---
+
+# Running the Server
 
 Start the FastAPI server:
 
@@ -102,7 +130,7 @@ Start the FastAPI server:
 uvicorn app.main:app --reload
 ```
 
-Server will run at:
+Server runs at:
 
 ```
 http://127.0.0.1:8000
@@ -110,7 +138,7 @@ http://127.0.0.1:8000
 
 ---
 
-## API Documentation
+# API Documentation
 
 Swagger UI:
 
@@ -118,17 +146,11 @@ Swagger UI:
 http://127.0.0.1:8000/docs
 ```
 
-OpenAPI schema:
-
-```
-http://127.0.0.1:8000/openapi.json
-```
-
 ---
 
-## Available Endpoints
+# API Endpoints
 
-### Health Check
+## Health Check
 
 ```
 GET /health
@@ -142,21 +164,22 @@ curl http://127.0.0.1:8000/health
 
 ---
 
-### List Available Tools
+## Upload Transactions Dataset
 
 ```
-GET /tools
+POST /upload-transactions
 ```
 
 Example:
 
 ```
-curl http://127.0.0.1:8000/tools
+curl -F "file=@data/transactions.csv" \
+http://127.0.0.1:8000/upload-transactions
 ```
 
 ---
 
-### Detect Large Transactions
+## Detect Large Transactions
 
 ```
 POST /tools/detect_large_expenses
@@ -168,26 +191,9 @@ Example:
 curl -X POST http://127.0.0.1:8000/tools/detect_large_expenses | jq
 ```
 
-Example response:
-
-```
-{
-  "results": [
-    {
-      "date": "2025-01-15",
-      "vendor": "Dell",
-      "amount": 8200,
-      "description": "Equipment",
-      "threshold": 6860.00,
-      "reason": "Transaction above 95th percentile of amounts"
-    }
-  ]
-}
-```
-
 ---
 
-### Detect Duplicate Payments
+## Detect Duplicate Payments
 
 ```
 POST /tools/find_duplicate_payments
@@ -201,9 +207,58 @@ curl -X POST http://127.0.0.1:8000/tools/find_duplicate_payments | jq
 
 ---
 
-## Sample Dataset
+## Generate Anomaly Report
 
-Example `transactions.csv`:
+```
+POST /report/anomalies
+```
+
+Example:
+
+```
+curl -X POST http://127.0.0.1:8000/report/anomalies | jq
+```
+
+Example response:
+
+```json
+{
+  "summary": {
+    "transactions_analyzed": 5,
+    "anomalies_detected": 3
+  },
+  "anomalies": [...]
+}
+```
+
+---
+
+## Generate AI-Explained Anomaly Report
+
+```
+POST /report/anomalies/explain
+```
+
+Example:
+
+```
+curl -X POST http://127.0.0.1:8000/report/anomalies/explain | jq
+```
+
+Example output:
+
+```json
+{
+  "vendor": "Dell",
+  "amount": "8200.00",
+  "anomaly_type": "large_transaction",
+  "ai_explanation": "This transaction is significantly higher than the vendor's typical payments and may require further review."
+}
+```
+
+---
+
+# Example Dataset
 
 ```
 date,description,vendor,amount
@@ -216,42 +271,39 @@ date,description,vendor,amount
 
 ---
 
-## Technology Stack
+# Technology Stack
 
 * Python
 * FastAPI
 * Pandas
 * Uvicorn
-
-Optional developer tools:
-
-* `curl`
-* `jq`
+* OpenAI API
+* python-dotenv
 
 ---
 
-## Development Status
+# Development Status
 
-Current version is an **early MVP** focused on core accounting anomaly detection.
+This project is an **early MVP exploring AI-assisted accounting analysis**.
 
 Planned improvements include:
 
-* CSV upload endpoint
-* AI-generated explanations for anomalies
-* Vendor spending analysis
-* PostgreSQL support
-* MCP-compatible tool schema definitions
-* Accounting reports API
+* Vendor spending anomaly detection
+* Time-based financial behavior analysis
+* Batch AI explanations
+* PostgreSQL persistence
+* MCP-compatible tool schemas
+* Simple analytics dashboard
 
 ---
 
-## License
+# License
 
 MIT License
 
 ---
 
-## Author
+# Author
 
 Edu
 Senior Python Developer
