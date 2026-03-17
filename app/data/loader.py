@@ -1,12 +1,24 @@
+from app.core.database import SessionLocal
+from app.models.transaction import Transaction
 import pandas as pd
-from app.core.config import DATA_FILE
+
 
 
 def load_transactions():
-    if not DATA_FILE.exists():
-        return pd.DataFrame()
+    db = SessionLocal()
 
-    df = pd.read_csv(DATA_FILE)
-    df.columns = [c.lower() for c in df.columns]
+    rows = db.query(Transaction).all()
 
-    return df
+    db.close()
+
+    data = [
+        {
+            "date": r.date,
+            "description": r.description,
+            "vendor": r.vendor,
+            "amount": r.amount
+        }
+        for r in rows
+    ]
+
+    return pd.DataFrame(data)

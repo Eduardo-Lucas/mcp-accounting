@@ -32,6 +32,13 @@ The service:
 ✔ AI-generated explanations for suspicious transactions
 ✔ Clean modular FastAPI architecture
 ✔ CLI testing with `curl` and `jq`
+✔ Upload accounting datasets via API  
+✔ Detect unusually large transactions  
+✔ Detect duplicate vendor payments  
+✔ Generate anomaly reports  
+✔ AI-generated explanations for suspicious transactions  
+✔ Modular FastAPI architecture (API / services / data layers)
+✔ MCP-style tool endpoints for automation or AI agents
 
 ---
 

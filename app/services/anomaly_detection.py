@@ -38,3 +38,29 @@ def detect_duplicate_payments(df: pd.DataFrame):
     duplicates["amount"] = duplicates["amount"].apply(lambda x: f"{x:.2f}")
 
     return duplicates.to_dict(orient="records")
+
+
+
+def detect_vendor_spikes(df):
+
+    if df.empty:
+        return []
+
+    vendor_totals = df.groupby("vendor")["amount"].sum()
+
+    avg_spend = vendor_totals.mean()
+
+    spikes = vendor_totals[vendor_totals > (avg_spend * 2)]
+
+    results = []
+
+    for vendor, total in spikes.items():
+
+        results.append({
+            "vendor": vendor,
+            "total_spend": f"{total:.2f}",
+            "average_vendor_spend": f"{avg_spend:.2f}",
+            "reason": "Vendor spending significantly above average",
+        })
+
+    return results

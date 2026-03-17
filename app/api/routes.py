@@ -1,6 +1,8 @@
 from fastapi import APIRouter, UploadFile, File
 from pathlib import Path
-import shutil
+import pandas as pd
+from app.core.database import SessionLocal
+from app.models.transaction import Transaction
 
 from app.mcp.tools import (
     get_transactions,
@@ -48,16 +50,27 @@ def api_duplicates():
 @router.post("/upload-transactions")
 def upload_transactions(file: UploadFile = File(...)):
 
-    DATA_DIR.mkdir(exist_ok=True)
+    df = pd.read_csv(file.file)
 
-    file_path = DATA_DIR / "transactions.csv"
+    db = SessionLocal()
 
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+    for _, row in df.iterrows():
+
+        tx = Transaction(
+            date=row["date"],
+            description=row["description"],
+            vendor=row["vendor"],
+            amount=row["amount"]
+        )
+
+        db.add(tx)
+
+    db.commit()
+    db.close()
 
     return {
-        "message": "file uploaded successfully",
-        "filename": file.filename
+        "message": "transactions ingested",
+        "rows": len(df)
     }
 
 
