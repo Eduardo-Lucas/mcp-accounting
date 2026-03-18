@@ -1,92 +1,65 @@
 # MCP Accounting
 
-An **AI-ready accounting anomaly detection API** built with **Python and FastAPI**.
-This project demonstrates how financial analysis capabilities can be exposed as **callable tools**, making them usable by automation systems or AI agents.
+An **AI-ready accounting anomaly detection API** built with **Python, FastAPI, and PostgreSQL**.
 
-The system analyzes accounting transactions, detects suspicious patterns, and generates **AI explanations for flagged anomalies**.
+This project demonstrates how financial analysis can be exposed as **callable API tools**, enabling automation and integration with AI agents.
 
 ---
 
 # Overview
 
-Traditional accounting analysis is often manual and time-consuming.
-This project explores a different architecture:
+The system processes accounting transactions and provides:
 
-**Expose accounting analytics as API tools that can be called by software or AI agents.**
+* anomaly detection
+* structured reporting
+* AI-generated explanations
 
-The service:
-
-1. Accepts accounting datasets (CSV)
-2. Detects potential anomalies
-3. Generates a structured report
-4. Uses AI to explain suspicious transactions
+It follows a modern backend architecture with **data ingestion, persistence, analytics, and AI layers**.
 
 ---
 
-# Current Features
+# Features
 
 ✔ Upload accounting datasets via API
+✔ Persistent storage using PostgreSQL
 ✔ Detect unusually large transactions
 ✔ Detect duplicate vendor payments
 ✔ Generate anomaly reports
-✔ AI-generated explanations for suspicious transactions
-✔ Clean modular FastAPI architecture
-✔ CLI testing with `curl` and `jq`
-✔ Upload accounting datasets via API  
-✔ Detect unusually large transactions  
-✔ Detect duplicate vendor payments  
-✔ Generate anomaly reports  
-✔ AI-generated explanations for suspicious transactions  
+✔ AI-generated explanations for anomalies
 ✔ Modular FastAPI architecture (API / services / data layers)
-✔ MCP-style tool endpoints for automation or AI agents
+✔ MCP-style tool endpoints for automation and AI agents
 
 ---
 
 # Architecture
 
-The backend follows a **layered architecture**:
-
-```
-HTTP API
+```id="6mrm5n"
+Client
    ↓
-API Routes
+FastAPI API
    ↓
 Service Layer
    ↓
-Data Layer
+PostgreSQL Database
+   ↓
+Analytics + AI Explanation
 ```
 
 Project structure:
 
-```
+```id="qcyweq"
 mcp-accounting
 │
 ├── app
 │   ├── api
-│   │   └── routes.py
-│   │
 │   ├── core
-│   │   └── config.py
-│   │
 │   ├── data
-│   │   └── loader.py
-│   │
 │   ├── mcp
-│   │   └── tools.py
-│   │
 │   ├── models
-│   │   └── schemas.py
-│   │
 │   ├── services
-│   │   ├── anomaly_detection.py
-│   │   ├── report_service.py
-│   │   └── explanation_service.py
-│   │
 │   └── main.py
 │
 ├── data
-│   └── transactions.csv
-│
 ├── requirements.txt
 └── README.md
 ```
@@ -95,23 +68,11 @@ mcp-accounting
 
 # Installation
 
-Clone the repository:
-
-```
+```bash id="c04xv6"
 git clone https://github.com/<your-username>/mcp-accounting.git
 cd mcp-accounting
-```
-
-Create a virtual environment:
-
-```
 python -m venv venv
 source venv/bin/activate
-```
-
-Install dependencies:
-
-```
 pip install -r requirements.txt
 ```
 
@@ -119,161 +80,110 @@ pip install -r requirements.txt
 
 # Environment Variables
 
-Create a `.env` file in the project root:
+Create a `.env` file:
 
-```
+```id="8p8k7b"
 OPENAI_API_KEY=your_api_key_here
+DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5432/mcp_accounting
 ```
-
-The application loads this automatically using `python-dotenv`.
 
 ---
 
-# Running the Server
+# Running the Application
 
-Start the FastAPI server:
+Start the API:
 
-```
+```bash id="h1bx68"
 uvicorn app.main:app --reload
 ```
 
-Server runs at:
+Access:
 
-```
-http://127.0.0.1:8000
-```
-
----
-
-# API Documentation
-
-Swagger UI:
-
-```
+```id="qhlc2y"
 http://127.0.0.1:8000/docs
 ```
 
 ---
 
+# Database Setup
+
+Ensure PostgreSQL is running and create the database:
+
+```sql id="h4d1y3"
+CREATE DATABASE mcp_accounting;
+```
+
+Tables are created automatically on startup.
+
+---
+
 # API Endpoints
 
-## Health Check
+## Health
 
-```
+```id="7r0fgi"
 GET /health
-```
-
-Example:
-
-```
-curl http://127.0.0.1:8000/health
 ```
 
 ---
 
-## Upload Transactions Dataset
+## Upload Transactions (Ingestion)
 
-```
+```id="zkc4tm"
 POST /upload-transactions
 ```
 
-Example:
-
-```
+```bash id="8f0e4o"
 curl -F "file=@data/transactions.csv" \
-http://127.0.0.1:8000/upload-transactions
+http://127.0.0.1:8000/upload-transactions | jq
 ```
 
 ---
 
 ## Detect Large Transactions
 
-```
+```id="s7vlxm"
 POST /tools/detect_large_expenses
-```
-
-Example:
-
-```
-curl -X POST http://127.0.0.1:8000/tools/detect_large_expenses | jq
 ```
 
 ---
 
 ## Detect Duplicate Payments
 
-```
+```id="3rt0in"
 POST /tools/find_duplicate_payments
-```
-
-Example:
-
-```
-curl -X POST http://127.0.0.1:8000/tools/find_duplicate_payments | jq
 ```
 
 ---
 
 ## Generate Anomaly Report
 
-```
+```id="ujg3m9"
 POST /report/anomalies
 ```
 
-Example:
-
-```
-curl -X POST http://127.0.0.1:8000/report/anomalies | jq
-```
-
-Example response:
-
-```json
-{
-  "summary": {
-    "transactions_analyzed": 5,
-    "anomalies_detected": 3
-  },
-  "anomalies": [...]
-}
-```
-
 ---
 
-## Generate AI-Explained Anomaly Report
+## Generate AI-Explained Report
 
-```
+```id="yijbof"
 POST /report/anomalies/explain
 ```
 
-Example:
-
-```
+```bash id="lf3o1g"
 curl -X POST http://127.0.0.1:8000/report/anomalies/explain | jq
-```
-
-Example output:
-
-```json
-{
-  "vendor": "Dell",
-  "amount": "8200.00",
-  "anomaly_type": "large_transaction",
-  "ai_explanation": "This transaction is significantly higher than the vendor's typical payments and may require further review."
-}
 ```
 
 ---
 
-# Example Dataset
+# Example Workflow
 
-```
-date,description,vendor,amount
-2025-01-01,Office Supplies,Staples,120
-2025-01-05,Consulting Fee,ABC Consulting,1500
-2025-01-10,Consulting Fee,ABC Consulting,1500
-2025-01-15,Equipment,Dell,8200
-2025-01-20,Software License,Microsoft,300
+```id="x2ydny"
+Upload CSV
+→ Data ingested into PostgreSQL
+→ Run anomaly detection
+→ Generate report
+→ Get AI explanations
 ```
 
 ---
@@ -283,7 +193,8 @@ date,description,vendor,amount
 * Python
 * FastAPI
 * Pandas
-* Uvicorn
+* PostgreSQL
+* SQLAlchemy
 * OpenAI API
 * python-dotenv
 
@@ -291,16 +202,21 @@ date,description,vendor,amount
 
 # Development Status
 
-This project is an **early MVP exploring AI-assisted accounting analysis**.
+This project is an **evolving MVP** focused on AI-assisted accounting analysis.
 
-Planned improvements include:
+Recent improvements:
 
+* PostgreSQL persistence layer
+* Data ingestion pipeline (CSV → DB)
+* AI explanation service
+
+Planned improvements:
+
+* Dockerized environment (API + DB)
 * Vendor spending anomaly detection
-* Time-based financial behavior analysis
+* Time-based anomaly detection
 * Batch AI explanations
-* PostgreSQL persistence
-* MCP-compatible tool schemas
-* Simple analytics dashboard
+* Dashboard UI
 
 ---
 

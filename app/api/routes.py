@@ -54,25 +54,25 @@ def upload_transactions(file: UploadFile = File(...)):
 
     db = SessionLocal()
 
-    for _, row in df.iterrows():
+    try:
+        for _, row in df.iterrows():
+            tx = Transaction(
+                date=row["date"],
+                description=row["description"],
+                vendor=row["vendor"],
+                amount=float(row["amount"])
+            )
+            db.add(tx)
 
-        tx = Transaction(
-            date=row["date"],
-            description=row["description"],
-            vendor=row["vendor"],
-            amount=row["amount"]
-        )
+        db.commit()
 
-        db.add(tx)
+        return {
+            "message": "transactions ingested successfully",
+            "rows_inserted": len(df)
+        }
 
-    db.commit()
-    db.close()
-
-    return {
-        "message": "transactions ingested",
-        "rows": len(df)
-    }
-
+    finally:
+        db.close()
 
 @router.post("/report/anomalies")
 def anomaly_report():
