@@ -1,8 +1,9 @@
 # MCP Accounting
 
-An **AI-ready accounting anomaly detection API** built with **Python, FastAPI, PostgreSQL, and Docker**.
+An **AI-powered accounting anomaly detection platform** built with  
+**FastAPI, PostgreSQL, React, Tailwind, and Docker**.
 
-This project demonstrates how financial analysis can be exposed as **callable API tools**, enabling integration with automation systems and AI agents.
+This project exposes financial analytics as **callable API tools (MCP-style)** and delivers a **full-stack user experience** with authentication and data ingestion.
 
 ---
 
@@ -10,218 +11,205 @@ This project demonstrates how financial analysis can be exposed as **callable AP
 
 The system processes accounting transactions and provides:
 
-* anomaly detection
-* structured reporting
-* AI-generated explanations
+- anomaly detection
+- structured reporting
+- AI-generated explanations
 
-It follows a modern backend architecture with **data ingestion, persistence, analytics, and AI layers**, fully containerized with Docker.
+It combines:
+
+- backend analytics engine
+- AI enrichment layer
+- authenticated frontend interface
 
 ---
 
 # Features
 
-✔ Upload accounting datasets via API
-✔ Persistent storage using PostgreSQL
-✔ Detect unusually large transactions
-✔ Detect duplicate vendor payments
-✔ Generate anomaly reports
-✔ AI-generated explanations for anomalies
-✔ Modular FastAPI architecture (API / services / data layers)
-✔ MCP-style tool endpoints for automation and AI agents
-✔ Fully containerized environment (Docker + Docker Compose)
+## Backend
+
+✔ Upload accounting datasets via API  
+✔ Persistent storage using PostgreSQL  
+✔ Detect unusually large transactions  
+✔ Detect duplicate vendor payments  
+✔ Generate anomaly reports  
+✔ AI-generated explanations for anomalies  
+✔ Modular architecture (API / services / data layers)  
+✔ MCP-style tool endpoints for automation and AI agents  
+
+---
+
+## Frontend
+
+✔ React + TypeScript UI  
+✔ Tailwind CSS styling  
+✔ Email/password authentication (JWT)  
+✔ Protected routes (dashboard)  
+✔ File upload interface (CSV ingestion)  
+
+---
+
+## Infrastructure
+
+✔ Fully containerized (Docker + Docker Compose)  
+✔ PostgreSQL with healthcheck  
+✔ Backend startup synchronization (wait-for-db)  
+✔ Reproducible local environment  
 
 ---
 
 # Architecture
 
-```id="6jqqc6"
-Client
-   ↓
-FastAPI API (Docker)
-   ↓
-Service Layer
-   ↓
-PostgreSQL (Docker)
-   ↓
-Analytics + AI Explanation
-```
+Frontend (React + Tailwind)  
+↓  
+FastAPI (API Layer)  
+↓  
+Service Layer (Business Logic)  
+↓  
+Data Layer (SQLAlchemy + PostgreSQL)  
+↓  
+AI Layer (OpenAI)  
 
-Project structure:
+---
 
-```id="3pq4u0"
-mcp-accounting
-│
-├── app/
-├── data/
-├── scripts/
-├── Dockerfile
-├── docker-compose.yml
-├── requirements.txt
-├── README.md
-└── .env
-```
+# Project Structure
+
+mcp-accounting  
+│  
+├── app/                # FastAPI backend  
+├── frontend/           # React + Tailwind frontend  
+├── data/  
+├── scripts/  
+├── Dockerfile  
+├── docker-compose.yml  
+├── requirements.txt  
+├── README.md  
+└── .env  
 
 ---
 
 # Run with Docker (Recommended)
 
-Start the entire system:
+Start the full system:
 
-```bash id="9tx1x0"
+```bash
 docker compose up --build
 ```
 
-This will start:
+---
 
-* FastAPI application
-* PostgreSQL database
+## Services
 
-API available at:
-
-```id="r6typo"
-http://localhost:8000/docs
-```
+- Frontend → http://localhost:5173  
+- Backend → http://localhost:8000/docs  
 
 ---
 
-# Manual Setup (Without Docker)
+# Authentication Flow
 
-```bash id="b7s0ey"
-git clone https://github.com/<your-username>/mcp-accounting.git
-cd mcp-accounting
-
-python -m venv venv
-source venv/bin/activate
-
-pip install -r requirements.txt
-```
-
----
-
-# Environment Variables
-
-Create a `.env` file:
-
-```id="6c9dlh"
-OPENAI_API_KEY=your_api_key_here
-DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5432/mcp_accounting
-```
-
----
-
-# Database Setup (Manual)
-
-```sql id="6qg17q"
-CREATE DATABASE mcp_accounting;
-```
-
-Tables are created automatically on startup.
+- Login with email + password  
+- Backend returns JWT token  
+- Token stored in frontend  
+- All protected endpoints require authentication  
 
 ---
 
 # API Endpoints
 
-## Health
+## Auth
 
-```id="7y2jqn"
-GET /health
-```
+POST /auth/login
 
 ---
 
-## Upload Transactions (Ingestion)
+## Upload Transactions
 
-```id="8cfu6l"
 POST /upload-transactions
-```
-
-```bash id="h2j32b"
-curl -F "file=@data/transactions.csv" \
-http://localhost:8000/upload-transactions
-```
 
 ---
 
-## Detect Large Transactions
+## Anomaly Detection
 
-```id="w1w0sk"
-POST /tools/detect_large_expenses
-```
-
----
-
-## Detect Duplicate Payments
-
-```id="bn04bt"
-POST /tools/find_duplicate_payments
-```
+POST /tools/detect_large_expenses  
+POST /tools/find_duplicate_payments  
 
 ---
 
-## Generate Anomaly Report
+## Reports
 
-```id="ub2p4c"
-POST /report/anomalies
-```
-
----
-
-## Generate AI-Explained Report
-
-```id="m7i1lq"
-POST /report/anomalies/explain
-```
-
-```bash id="qhr2gl"
-curl -X POST http://localhost:8000/report/anomalies/explain
-```
+POST /report/anomalies  
+POST /report/anomalies/explain  
 
 ---
 
 # Example Workflow
 
-```id="xztij1"
-Upload CSV
-→ Data ingested into PostgreSQL
-→ Run anomaly detection
-→ Generate report
-→ Get AI explanations
-```
+Login  
+→ Upload CSV  
+→ Data stored in PostgreSQL  
+→ Run anomaly detection  
+→ Generate report  
+→ AI explanation  
 
 ---
 
 # Technology Stack
 
-* Python
-* FastAPI
-* Pandas
-* PostgreSQL
-* SQLAlchemy
-* OpenAI API
-* python-dotenv
-* Docker
-* Docker Compose
+## Backend
+- FastAPI  
+- SQLAlchemy  
+- PostgreSQL  
+- Pandas  
+
+## Frontend
+- React  
+- TypeScript  
+- Tailwind CSS  
+
+## AI
+- OpenAI API  
+
+## Infrastructure
+- Docker  
+- Docker Compose  
+
+---
+
+# Environment Variables
+
+OPENAI_API_KEY=your_api_key_here  
+DATABASE_URL=postgresql://postgres:postgres@postgres:5432/postgres  
+SECRET_KEY=your-secret-key  
 
 ---
 
 # Development Status
 
-This project is an **evolving MVP focused on AI-assisted accounting analysis**.
+This project has evolved into a **full-stack AI-powered financial analysis tool**.
 
-Recent improvements:
+### Recent Improvements
 
-* PostgreSQL persistence layer
-* Data ingestion pipeline (CSV → DB)
-* AI explanation service
-* Dockerized environment with healthcheck and startup synchronization
+- React + Tailwind frontend  
+- JWT authentication (email-based login)  
+- Protected routes and dashboard structure  
+- Improved Docker setup (healthcheck + wait-for-db)  
+- Structured API + service + data layers  
 
-Planned improvements:
+---
 
-* Vendor spending anomaly detection
-* Time-based anomaly detection
-* Alembic migrations
-* Authentication (API keys)
-* Dashboard UI
+### Planned Improvements
+
+- Upload history per user  
+- Anomaly dashboard (UI)  
+- Background processing (Celery)  
+- Role-based access control  
+- Audit logging  
+- Alembic migrations  
+
+---
+
+# Positioning
+
+> **AI-powered financial audit assistant** focused on anomaly detection, explainability, and automation readiness.
 
 ---
 
@@ -233,5 +221,5 @@ MIT License
 
 # Author
 
-Edu
+Edu  
 Senior Python Developer

@@ -1,0 +1,13 @@
+# app/core/deps.py
+from fastapi import Depends, HTTPException
+from fastapi.security import HTTPBearer
+from jose import jwt, JWTError
+
+security = HTTPBearer()
+
+def get_current_user(token=Depends(security)):
+    try:
+        payload = jwt.decode(token.credentials, "your-secret", algorithms=["HS256"])
+        return payload["sub"]
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")

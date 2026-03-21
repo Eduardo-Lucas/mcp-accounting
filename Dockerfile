@@ -1,10 +1,11 @@
 FROM python:3.11-slim
 
-WORKDIR /app
-
 # Python settings
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/app
+
+WORKDIR /app
 
 # System dependencies (required for psycopg2)
 RUN apt-get update && apt-get install -y \
