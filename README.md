@@ -1,225 +1,252 @@
-# MCP Accounting
+# MCP Accounting Platform
 
-An **AI-powered accounting anomaly detection platform** built with  
-**FastAPI, PostgreSQL, React, Tailwind, and Docker**.
-
-This project exposes financial analytics as **callable API tools (MCP-style)** and delivers a **full-stack user experience** with authentication and data ingestion.
+An **AI-powered accounting anomaly detection platform** built with **FastAPI, PostgreSQL, React, and OpenAI**, featuring a complete **production-ready authentication system**.
 
 ---
 
-# Overview
+## 🚀 Overview
 
-The system processes accounting transactions and provides:
+MCP Accounting is a full-stack system designed to:
 
-- anomaly detection
-- structured reporting
-- AI-generated explanations
-
-It combines:
-
-- backend analytics engine
-- AI enrichment layer
-- authenticated frontend interface
+* Ingest financial transaction data
+* Detect anomalies (large transactions, duplicates)
+* Generate AI-powered explanations
+* Expose functionality as **MCP-style callable APIs**
 
 ---
 
-# Features
+## 🧱 Tech Stack
 
-## Backend
+### Backend
 
-✔ Upload accounting datasets via API  
-✔ Persistent storage using PostgreSQL  
-✔ Detect unusually large transactions  
-✔ Detect duplicate vendor payments  
-✔ Generate anomaly reports  
-✔ AI-generated explanations for anomalies  
-✔ Modular architecture (API / services / data layers)  
-✔ MCP-style tool endpoints for automation and AI agents  
+* FastAPI
+* SQLAlchemy
+* PostgreSQL
+* Passlib (bcrypt)
+* JWT (authentication)
+* Docker
 
----
+### Frontend
 
-## Frontend
+* React (TypeScript)
+* Tailwind CSS
 
-✔ React + TypeScript UI  
-✔ Tailwind CSS styling  
-✔ Email/password authentication (JWT)  
-✔ Protected routes (dashboard)  
-✔ File upload interface (CSV ingestion)  
+### AI Layer
+
+* OpenAI API (explanations)
 
 ---
 
-## Infrastructure
+## 🔐 Authentication System (Production-Ready)
 
-✔ Fully containerized (Docker + Docker Compose)  
-✔ PostgreSQL with healthcheck  
-✔ Backend startup synchronization (wait-for-db)  
-✔ Reproducible local environment  
+### Features Implemented
 
----
-
-# Architecture
-
-Frontend (React + Tailwind)  
-↓  
-FastAPI (API Layer)  
-↓  
-Service Layer (Business Logic)  
-↓  
-Data Layer (SQLAlchemy + PostgreSQL)  
-↓  
-AI Layer (OpenAI)  
+* ✅ User registration
+* ✅ Email verification (token-based)
+* ✅ Secure password hashing (bcrypt)
+* ✅ Login with JWT (stateless auth)
+* ✅ Password reset flow
+* ✅ Protected routes (JWT-ready)
 
 ---
 
-# Project Structure
+### Auth Flow
 
-mcp-accounting  
-│  
-├── app/                # FastAPI backend  
-├── frontend/           # React + Tailwind frontend  
-├── data/  
-├── scripts/  
-├── Dockerfile  
-├── docker-compose.yml  
-├── requirements.txt  
-├── README.md  
-└── .env  
+#### Registration
+
+1. User registers
+2. User is created as **inactive/unverified**
+3. Verification token generated (DB)
+4. Email sent with verification link
+
+#### Email Verification
+
+* Token validated
+* User marked as:
+
+  * `is_active = True`
+  * `is_verified = True`
+* Token invalidated after use
+
+#### Login
+
+* Validates:
+
+  * Email exists
+  * Password matches (bcrypt)
+  * User is verified
+* Returns JWT:
+
+```json
+{
+  "access_token": "jwt-token",
+  "token_type": "bearer"
+}
+```
+
+#### Password Reset
+
+1. Request reset
+2. Token generated and emailed
+3. User submits new password
+4. Token invalidated
 
 ---
 
-# Run with Docker (Recommended)
+## 🏗️ Architecture
 
-Start the full system:
+```
+Frontend (React)
+        ↓
+FastAPI (API Layer)
+        ↓
+Service Layer (Business Logic)
+        ↓
+SQLAlchemy ORM
+        ↓
+PostgreSQL
+        ↓
+AI Layer (OpenAI)
+```
+
+---
+
+## 🔄 Data Flow
+
+```
+Register → Verify Email → Login → Upload CSV
+        ↓
+Store Transactions → Detect Anomalies
+        ↓
+Generate Report → AI Explanation
+```
+
+---
+
+## 🧩 API Endpoints
+
+### Auth
+
+* `POST /auth/register`
+* `POST /auth/login`
+* `GET /verify-email`
+* `POST /forgot-password`
+* `POST /reset-password`
+
+### Core Features
+
+* `POST /upload-transactions`
+* `POST /tools/get_transactions`
+* `POST /tools/detect_large_expenses`
+* `POST /tools/find_duplicate_payments`
+* `POST /report/anomalies`
+* `POST /report/anomalies/explain`
+
+---
+
+## 🐳 Running with Docker
 
 ```bash
 docker compose up --build
 ```
 
----
+### Access:
 
-## Services
-
-- Frontend → http://localhost:5173  
-- Backend → http://localhost:8000/docs  
+* API Docs: http://localhost:8000/docs
+* Frontend: http://localhost:3000
 
 ---
 
-# Authentication Flow
+## ⚙️ Environment Variables
 
-- Login with email + password  
-- Backend returns JWT token  
-- Token stored in frontend  
-- All protected endpoints require authentication  
-
----
-
-# API Endpoints
-
-## Auth
-
-POST /auth/login
+```env
+DATABASE_URL=postgresql://postgres:postgres@db:5432/mcp_accounting
+SECRET_KEY=your-secret-key
+FRONTEND_URL=http://localhost:3000
+```
 
 ---
 
-## Upload Transactions
+## 🧠 Key Technical Decisions
 
-POST /upload-transactions
+### 1. Separation of Token Types
 
----
-
-## Anomaly Detection
-
-POST /tools/detect_large_expenses  
-POST /tools/find_duplicate_payments  
-
----
-
-## Reports
-
-POST /report/anomalies  
-POST /report/anomalies/explain  
+| Use Case           | Mechanism |
+| ------------------ | --------- |
+| Email verification | DB token  |
+| Password reset     | DB token  |
+| Authentication     | JWT       |
 
 ---
 
-# Example Workflow
+### 2. Security Practices
 
-Login  
-→ Upload CSV  
-→ Data stored in PostgreSQL  
-→ Run anomaly detection  
-→ Generate report  
-→ AI explanation  
+* Password hashing via bcrypt
+* No plaintext password storage
+* Token invalidation after use
+* Generic login errors (no user enumeration)
 
 ---
 
-# Technology Stack
+### 3. SQLAlchemy Best Practices
 
-## Backend
-- FastAPI  
-- SQLAlchemy  
-- PostgreSQL  
-- Pandas  
-
-## Frontend
-- React  
-- TypeScript  
-- Tailwind CSS  
-
-## AI
-- OpenAI API  
-
-## Infrastructure
-- Docker  
-- Docker Compose  
+* Single `Base` instance
+* Proper model registration
+* Dependency-injected DB sessions
 
 ---
 
-# Environment Variables
+### 4. Dockerized Environment
 
-OPENAI_API_KEY=your_api_key_here  
-DATABASE_URL=postgresql://postgres:postgres@postgres:5432/postgres  
-SECRET_KEY=your-secret-key  
-
----
-
-# Development Status
-
-This project has evolved into a **full-stack AI-powered financial analysis tool**.
-
-### Recent Improvements
-
-- React + Tailwind frontend  
-- JWT authentication (email-based login)  
-- Protected routes and dashboard structure  
-- Improved Docker setup (healthcheck + wait-for-db)  
-- Structured API + service + data layers  
+* Service-based networking (`db`)
+* Environment-driven configuration
+* Clean container rebuilds
 
 ---
 
-### Planned Improvements
+## 🧪 Current Status
 
-- Upload history per user  
-- Anomaly dashboard (UI)  
-- Background processing (Celery)  
-- Role-based access control  
-- Audit logging  
-- Alembic migrations  
-
----
-
-# Positioning
-
-> **AI-powered financial audit assistant** focused on anomaly detection, explainability, and automation readiness.
+* ✅ End-to-end functional
+* ✅ Authentication fully implemented
+* ✅ Stable Docker environment
+* ✅ Clean API contracts
+* ✅ AI integration working
 
 ---
 
-# License
+## 📌 Next Steps
+
+* [ ] Alembic migrations (schema versioning)
+* [ ] JWT-protected endpoints
+* [ ] Role-based access control (RBAC)
+* [ ] Background jobs (email queue)
+* [ ] Token hashing (security hardening)
+* [ ] Observability (logs + metrics)
+
+---
+
+## 💡 Project Purpose
+
+This project demonstrates:
+
+* Real-world backend architecture
+* Secure authentication design
+* AI integration into financial workflows
+* MCP-style API exposure for automation
+
+---
+
+## 👨‍💻 Author
+
+Developed as a **production-style backend system** to showcase:
+
+* Python / FastAPI expertise
+* System design & architecture
+* Secure authentication flows
+* AI-driven application design
+
+---
+
+## 📄 License
 
 MIT License
-
----
-
-# Author
-
-Edu  
-Senior Python Developer
