@@ -1,4 +1,3 @@
-version: "3.9"
 
 services:
 
@@ -14,7 +13,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d mcp_accounting" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -30,7 +29,7 @@ services:
     env_file:
       - .env
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@db:5432/mcp_accounting
+      DATABASE_URL: ${DATABASE_URL}
 
 volumes:
   postgres_data:

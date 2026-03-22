@@ -1,4 +1,4 @@
-from app.core.database import SessionLocal
+from app.db.session import SessionLocal
 from app.models.transaction import Transaction
 import pandas as pd
 

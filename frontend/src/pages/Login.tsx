@@ -20,30 +20,26 @@ export default function Login() {
       return;
     }
 
+    setLoading(true);
     try {
-      setLoading(true);
-
       const response = await api.post("/auth/login", {
         email,
         password,
       });
 
-      const token = response.data.access_token;
-
-      localStorage.setItem("access_token", token);
-
       navigate("/dashboard");
+    } catch (error: any) {
+        console.log("FULL ERROR:", error);
+        console.log("RESPONSE:", error?.response);
+        console.log("DATA:", error?.response?.data);
+        console.log("STATUS:", error?.response?.status);
 
-    } catch (err: any) {
-      console.log("ERROR:", err);
-      console.log("RESPONSE:", err.response);
-
-      if (err.response?.status === 401) {
-        setError("Invalid email or password");
-      } else {
-        setError("Unexpected error. Try again.");
+        setError(
+          error?.response?.data?.detail ||
+          JSON.stringify(error?.response?.data) ||
+          "Login failed"
+        );
       }
-    }
   };
 
   return (
