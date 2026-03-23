@@ -1,6 +1,6 @@
 // src/pages/Login.tsx
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { api } from "../api/client";
 
 export default function Login() {
@@ -27,19 +27,24 @@ export default function Login() {
         password,
       });
 
+      // store token
+      localStorage.setItem("token", response.data.access_token);
+
       navigate("/dashboard");
     } catch (error: any) {
-        console.log("FULL ERROR:", error);
-        console.log("RESPONSE:", error?.response);
-        console.log("DATA:", error?.response?.data);
-        console.log("STATUS:", error?.response?.status);
+      console.log("FULL ERROR:", error);
+      console.log("RESPONSE:", error?.response);
+      console.log("DATA:", error?.response?.data);
+      console.log("STATUS:", error?.response?.status);
 
-        setError(
-          error?.response?.data?.detail ||
-          JSON.stringify(error?.response?.data) ||
-          "Login failed"
-        );
-      }
+      setError(
+        error?.response?.data?.detail ||
+        JSON.stringify(error?.response?.data) ||
+        "Login failed"
+      );
+    } finally {
+      setLoading(false); // 🔧 important fix (was missing)
+    }
   };
 
   return (
@@ -83,6 +88,17 @@ export default function Login() {
         >
           {loading ? "Signing in..." : "Sign in"}
         </button>
+
+        {/* ✅ Register link */}
+        <p className="mt-6 text-sm text-center text-gray-600">
+          Don’t have an account?{" "}
+          <Link
+            to="/register"
+            className="text-blue-600 font-medium hover:underline"
+          >
+            Create one
+          </Link>
+        </p>
 
       </div>
     </div>

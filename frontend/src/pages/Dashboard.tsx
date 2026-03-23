@@ -1,10 +1,10 @@
 // src/pages/Dashboard.tsx
+
 export default function Dashboard() {
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <h1 className="text-2xl font-bold">
-        Dashboard (authenticated)
-      </h1>
+    <div className="p-6">
+      <h1 className="text-2xl font-bold">Dashboard</h1>
+      <p className="mt-2">Welcome to MCP Accounting 🚀</p>
     </div>
   );
 }
